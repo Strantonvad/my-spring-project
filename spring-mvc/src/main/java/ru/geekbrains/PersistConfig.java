@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import ru.geekbrains.persistance.ProductRepository;
 import ru.geekbrains.persistance.UserRepository;
 
 import javax.sql.DataSource;
@@ -29,6 +30,11 @@ public class PersistConfig {
     @Bean
     public UserRepository userRepository(DataSource dataSource) throws SQLException {
         return new UserRepository(dataSource);
+    }
+
+    @Bean
+    public ProductRepository productRepository(DataSource dataSource) throws SQLException {
+        return new ProductRepository(dataSource);
     }
 
     @Bean

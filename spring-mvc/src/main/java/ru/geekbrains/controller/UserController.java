@@ -35,8 +35,8 @@ public class UserController {
     }
 
     @PostMapping("/update")
-    public String updateUser(User user) {
-        // TODO написать метод userRepository.update();
+    public String updateUser(User user) throws SQLException {
+        userRepository.update(user);
         return "redirect:/user";
     }
 }
