@@ -3,14 +3,13 @@ package ru.geekbrains.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.persistance.Product;
 import ru.geekbrains.persistance.ProductRepository;
 import ru.geekbrains.persistance.User;
 
+import javax.validation.Valid;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -35,9 +34,30 @@ public class ProductController {
         return "product";
     }
 
+    @GetMapping("/new")
+    public String newProduct(Model model) {
+        Product product = new Product();
+        model.addAttribute("product", product);
+        return "product";
+    }
+
     @PostMapping("/update")
-    public String updateProduct(Product product) throws SQLException {
-        productRepository.update(product);
+    public String updateProduct(@Valid Product product, BindingResult bindingResult) throws SQLException {
+        if (bindingResult.hasErrors()) {
+            return "product";
+        }
+
+        if (product.getId() != 0) {
+            productRepository.update(product);
+        } else {
+            productRepository.insert(product);
+        }
+        return "redirect:/product";
+    }
+
+    @DeleteMapping("/{id}/delete")
+    public String deleteProduct(@PathVariable("id") Integer id) throws SQLException {
+        productRepository.delete(id);
         return "redirect:/product";
     }
 }

@@ -35,7 +35,7 @@
 <div class="container">
     <div class="row py-2">
         <div class="col-12">
-            <a class="btn btn-primary" href="addProduct.html">Add Product</a>
+            <a class="btn btn-primary" th:href="@{/product/new}">Add Product</a>
         </div>
 
         <div class="col-12">
@@ -55,7 +55,9 @@
                     <td th:text="${product.cost}">Price</td>
                     <td>
                         <a class="btn btn-success" th:href="@{/product/{id}(id = ${product.id})}"><i class="fas fa-edit"></i></a>
-                        <a class="btn btn-danger" href="#"><i class="far fa-trash-alt"></i></a>
+                        <form class="d-inline" th:action="@{/product/{id}/delete(id = ${product.id})}" th:method="delete">
+                            <button type="submit" class="btn btn-danger"><i class="far fa-trash-alt"></i></button>
+                        </form>
                     </td>
                 </tr>
                 </tbody>

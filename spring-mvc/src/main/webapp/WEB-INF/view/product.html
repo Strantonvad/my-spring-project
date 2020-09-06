@@ -40,8 +40,12 @@
                 <div class="form-group">
                     <label>Title</label>
                     <input type="text" class="form-control" th:field="*{title}" placeholder="Enter title">
+                    <small id="titleError" class="form-text text-error"
+                           th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Validation error</small>
                     <label>Price</label>
                     <input type="text" class="form-control" th:field="*{cost}" placeholder="Enter cost">
+                    <small id="costError" class="form-text text-error"
+                           th:if="${#fields.hasErrors('cost')}" th:errors="*{cost}">Validation error</small>
                 </div>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
