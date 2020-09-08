@@ -66,6 +66,14 @@ public class ProductRepository {
         return res;
     }
 
+    public void delete(Integer id) throws SQLException {
+        try (PreparedStatement stmt = conn.prepareStatement(
+            "delete from products where id = ?;")) {
+            stmt.setLong(1, id);
+            stmt.execute();
+        }
+    }
+
     private void createTableIfNotExists(Connection conn) throws SQLException {
         try (Statement stmt = conn.createStatement()) {
             stmt.execute("create table if not exists products (\n" +

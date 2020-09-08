@@ -1,9 +1,17 @@
 package ru.geekbrains.persistance;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 public class Product {
-    private final int id;
-    private final String title;
-    private final Double cost;
+    private int id;
+    @NotBlank
+    private String title;
+    @NotNull
+    private Double cost;
+
+    public Product() {
+    }
 
     public Product(int id, String title, Double cost) {
         this.id = id;
@@ -15,11 +23,23 @@ public class Product {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getTitle() {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public Double getCost() {
         return cost;
+    }
+
+    public void setCost(Double cost) {
+        this.cost = cost;
     }
 }

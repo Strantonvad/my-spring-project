@@ -4,6 +4,7 @@ import org.hibernate.cfg.Configuration;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.math.BigDecimal;
 
 public class Main {
 
@@ -52,13 +53,31 @@ public class Main {
 //
 //        em.close();
 
+//        EntityManager em = emFactory.createEntityManager();
+//
+//        User user = em.find(User.class, 1);
+//        Contact contact = new Contact(null, "mobile phone", "123456789", user);
+//
+//        em.getTransaction().begin();
+//        em.persist(contact);
+//        em.getTransaction().commit();
+
         EntityManager em = emFactory.createEntityManager();
 
-        User user = em.find(User.class, 1);
-        Contact contact = new Contact(null, "mobile phone", "123456789", user);
-
         em.getTransaction().begin();
-        em.persist(contact);
+
+        Customer customer = new Customer(null, "Customer 1");
+        em.persist(customer);
+        customer = em.find(Customer.class, 1);
+
+        Product product = new Product(null, "Product 1", new BigDecimal(1234));
+        em.persist(product);
+        product = em.find(Product.class, 1);
+
+        OrderItem orderItem = new OrderItem(null, customer, product, product.getPrice(), 1);
+        em.persist(orderItem);
+
         em.getTransaction().commit();
+
     }
 }
