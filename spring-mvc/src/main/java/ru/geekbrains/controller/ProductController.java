@@ -1,17 +1,21 @@
 package ru.geekbrains.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.geekbrains.persist.entity.Product;
 import ru.geekbrains.persist.repo.ProductRepository;
+import ru.geekbrains.persist.repo.ProductSpecification;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/product")
@@ -24,21 +28,27 @@ public class ProductController {
     public String allProducts(Model model,
                               @RequestParam(value = "title", required = false) String title,
                               @RequestParam(value = "minPrice", required = false) BigDecimal minPrice,
-                              @RequestParam(value = "maxPrice", required = false) BigDecimal maxPrice) {
+                              @RequestParam(value = "maxPrice", required = false) BigDecimal maxPrice,
+                              @RequestParam("page") Optional<Integer> page,
+                              @RequestParam("size") Optional<Integer> size) {
 
-        List<Product> allProducts;
-        if((title == null || title.isEmpty()) && (minPrice == null && maxPrice == null)) {
-            allProducts = productRepository.findAll();
-        } else if (maxPrice != null && minPrice == null ) {
-            allProducts = productRepository.findByCostLessThanEqual(maxPrice);
-        } else if (minPrice != null && maxPrice == null ) {
-            allProducts = productRepository.findByCostGreaterThan(minPrice);
-        } else if (minPrice != null && maxPrice != null) {
-            allProducts = productRepository.findByCostBetween(minPrice, maxPrice);
-        } else {
-            allProducts = productRepository.findByTitleLike("%" + title + "%");
+        Sort sort = Sort.by("id").ascending();
+
+        PageRequest pageRequest = PageRequest.of(page.orElse(1) - 1, size.orElse(5), sort);
+
+        Specification<Product> spec = ProductSpecification.trueLiteral();
+
+        if (title != null && !title.isEmpty()) {
+            spec = spec.and(ProductSpecification.titleLike(title));
         }
-        model.addAttribute("products", allProducts);
+        if (minPrice != null) {
+            spec = spec.and(ProductSpecification.greaterThanMinPrice(minPrice));
+        }
+        if (maxPrice != null) {
+            spec = spec.and(ProductSpecification.lessThanMaxPrice(maxPrice));
+        }
+
+        model.addAttribute("productsPage", productRepository.findAll(spec, pageRequest));
         return "products";
     }
 
@@ -67,7 +77,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}/delete")
-    public String deleteProduct(@PathVariable("id") Integer id) throws SQLException {
+    public String deleteProduct(@PathVariable("id") Integer id) {
         productRepository.deleteById(id);
         return "redirect:/product";
     }
