@@ -1,19 +1,26 @@
-package ru.geekbrains.persistance;
+package ru.geekbrains.persist.entity;
 
+import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
 
+@Entity
+@Table(name = "users")
 public class User {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column
     @NotBlank
     private String login;
 
+    @Column
     @NotBlank
     private String password;
 
-
+    @Transient
     private String matchingPassword;
 
     public User() {

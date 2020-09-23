@@ -1,17 +1,21 @@
 package ru.geekbrains.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ru.geekbrains.persistance.Product;
-import ru.geekbrains.persistance.ProductRepository;
-import ru.geekbrains.persistance.User;
+import ru.geekbrains.persist.entity.Product;
+import ru.geekbrains.persist.repo.ProductRepository;
+import ru.geekbrains.persist.repo.ProductSpecification;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/product")
@@ -21,15 +25,36 @@ public class ProductController {
     ProductRepository productRepository;
 
     @GetMapping
-    public String allProducts(Model model) throws SQLException {
-        List<Product> allProducts = productRepository.getAllProducts();
-        model.addAttribute("products", allProducts);
+    public String allProducts(Model model,
+                              @RequestParam(value = "title", required = false) String title,
+                              @RequestParam(value = "minPrice", required = false) BigDecimal minPrice,
+                              @RequestParam(value = "maxPrice", required = false) BigDecimal maxPrice,
+                              @RequestParam("page") Optional<Integer> page,
+                              @RequestParam("size") Optional<Integer> size) {
+
+        Sort sort = Sort.by("id").ascending();
+
+        PageRequest pageRequest = PageRequest.of(page.orElse(1) - 1, size.orElse(5), sort);
+
+        Specification<Product> spec = ProductSpecification.trueLiteral();
+
+        if (title != null && !title.isEmpty()) {
+            spec = spec.and(ProductSpecification.titleLike(title));
+        }
+        if (minPrice != null) {
+            spec = spec.and(ProductSpecification.greaterThanMinPrice(minPrice));
+        }
+        if (maxPrice != null) {
+            spec = spec.and(ProductSpecification.lessThanMaxPrice(maxPrice));
+        }
+
+        model.addAttribute("productsPage", productRepository.findAll(spec, pageRequest));
         return "products";
     }
 
     @GetMapping("/{id}")
-    public String editProduct(@PathVariable("id") Long id, Model model) throws SQLException {
-        Product product = productRepository.findById(id);
+    public String editProduct(@PathVariable("id") Integer id, Model model) {
+        Product product = productRepository.findById(id).get();
         model.addAttribute("product", product);
         return "product";
     }
@@ -42,22 +67,18 @@ public class ProductController {
     }
 
     @PostMapping("/update")
-    public String updateProduct(@Valid Product product, BindingResult bindingResult) throws SQLException {
+    public String updateProduct(@Valid Product product, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "product";
         }
 
-        if (product.getId() != 0) {
-            productRepository.update(product);
-        } else {
-            productRepository.insert(product);
-        }
+        productRepository.save(product);
         return "redirect:/product";
     }
 
     @DeleteMapping("/{id}/delete")
-    public String deleteProduct(@PathVariable("id") Integer id) throws SQLException {
-        productRepository.delete(id);
+    public String deleteProduct(@PathVariable("id") Integer id) {
+        productRepository.deleteById(id);
         return "redirect:/product";
     }
 }
