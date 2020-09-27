@@ -11,6 +11,7 @@
         <module>network-chat</module>
         <module>spring-mvc</module>
         <module>hibernate</module>
+        <module>spring-boot</module>
     </modules>
     <packaging>pom</packaging>
 

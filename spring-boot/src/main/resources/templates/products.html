@@ -83,7 +83,7 @@
                 <ul class="pagination">
                     <li class="page-item" th:classappend="${productsPage.number eq 0} ? 'disabled' : ''">
                         <a class="page-link"
-                           th:href="@{product(page=${(productsPage.number + 1) - 1}, size=${productsPage.size}, title=${title}, cost=${cost})}">
+                           th:href="@{product(page=${(productsPage.number + 1) - 1}, size=${productsPage.size}, title=${param.title}, cost=${param.cost})}">
                             Previous</a>
                     </li>
                     <li th:each="num: ${#numbers.sequence(1, productsPage.totalPages)}"
@@ -94,7 +94,7 @@
                     </li>
                     <li class="page-item" th:classappend="${productsPage.number + 1 ge productsPage.totalPages} ? 'disabled' : ''">
                         <a class="page-link"
-                           th:href="@{product(page=${productsPage.number + 2}, size=${productsPage.size}, title=${title}, cost=${cost})}">
+                           th:href="@{product(page=${productsPage.number + 2}, size=${productsPage.size}, title=${param.title}, cost=${param.cost})}">
                             Next</a>
                     </li>
                 </ul>
