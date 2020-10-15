@@ -1,0 +1,31 @@
+GET http://localhost:8080/mvc-app/api/v1/product/18/id
+
+###
+
+GET http://localhost:8080/mvc-app/api/v1/product/all
+
+###
+
+POST http://localhost:8080/mvc-app/api/v1/product/
+Content-Type: application/json
+
+{
+    "title": "mouse",
+    "cost": 888.0
+}
+
+###
+
+PUT http://localhost:8080/mvc-app/api/v1/product/
+Content-Type: application/json
+
+{
+  "id": 18,
+  "title": "mouse2",
+  "cost": 888.2
+}
+
+###
+
+DELETE http://localhost:8080/mvc-app/api/v1/product/18/id
+
