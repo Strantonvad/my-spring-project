@@ -3,6 +3,8 @@ package ru.geekbrains.persist.entity;
 import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotBlank;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -26,15 +28,31 @@ public class User {
     public User() {
     }
 
-    public User(int id, String login, String password) {
-        this.id = id;
+    public User(String login, String password) {
         this.login = login;
         this.password = password;
     }
 
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
+
+
     @AssertTrue(message="Your password and confirmation password do not match!")
     public boolean isValidPassword() {
         return this.password.equals(this.matchingPassword);
+    }
+
+    public void addRole(Role role) {
+        roles.add(role);
+        role.getUsers().add(this);
+    }
+
+    public String getRole() {
+        return roles.iterator().next().toString();
     }
 
     public int getId() {
